@@ -29,7 +29,7 @@ foo.b = 4;
 BookKeeper will, upon serialization, persist a JSON structure like this
 
 ```javascript
-{ "a" : 1, "b" : 2, "c" : 3, diffs : [ { "u": ["b" : 4], "t": "2012-10-16T06:19Z" } ] }
+{ "a" : 1, "b" : 2, "c" : 3, "diffs" : [ { "u": ["b" : 4], "t": "2012-10-16T06:19Z" } ] }
 ```
 
 The idea is to start with a base object state, and to provide a list of
@@ -80,14 +80,14 @@ fast techniques within a compiled language to set properties while
 replaying changes is a fast enough approach.
 
 The issue of compacting objects over time is not one that we will be
-addressing over time.  This is something that we are punting to a
+addressing at this time.  This is something that we are punting to a
 higher application level at the moment, but could eventually implement.
 
 There may be advantages to keeping an audit history of an object over
 time, for instance.
 
 If you have an object that is frequently updated in a data store, and
-generations, for instance, thousands of changes over time, this might
+generates, for instance, thousands of changes over time, this might
 not be the best implementation for you at this time.
 
 ## Inspiration
