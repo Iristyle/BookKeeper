@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EqualityComparer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,15 +13,16 @@ namespace BookKeeper
       this.AuditLog = new List<AuditEntry>();
     }
 
+    private static GenericEqualityComparer<AuditEntry> idOnlyComparer = new GenericEqualityComparer<AuditEntry>((a1, a2) => a1.Id == a2.Id);
     public T Original { get; private set; }
 
     /// <summary>
     /// Instance Merge, generally used for simple updates. Gets diff of object and adds to AuditLog.
     /// </summary>
     /// <param name="obj">The new version of the object</param>
-    /// <param name="userId">Optional: To track the user that made the changes</param>
+    /// <param name="meta">To keep metadata with the AuditEntry, such as user information.</param>
     /// <returns>A representation on the object as Audited</returns>
-    public Audited<T> Merge(T obj, string userId)
+    public Audited<T> Merge(T obj, Dictionary<string,string> meta)
     {
       //Set up new Audited<T> for merge
       Audited<T> mergedAuditedObj = new Audited<T>(this.Original);
@@ -28,11 +30,21 @@ namespace BookKeeper
 
       //Get new AuditEntry
       AuditEntry auditEntry = GetAuditEntry(this, obj);
-      auditEntry.UserId = userId;
+      auditEntry.Meta = meta;
       
       //Add AuditEntry to Audited<T> and return
       mergedAuditedObj.AuditLog.Add(auditEntry);
       return mergedAuditedObj;
+    }
+
+    /// <summary>
+    /// Instance Merge, generally used for simple updates. Gets diff of object and adds to AuditLog.
+    /// </summary>
+    /// <param name="obj">The new version of the object</param>
+    /// <returns>A representation on the object as Audited</returns>
+    public Audited<T> Merge(T obj)
+    {
+      return (Merge(obj, null));
     }
 
     /// <summary>
@@ -44,7 +56,7 @@ namespace BookKeeper
     {
       if (objects.Count < 2) { throw new ArgumentException("Must merge 2 or more objects", "objects"); }
       var merged = new Audited<T>(objects[0].Original);
-      merged.AuditLog = objects.SelectMany(o => o.AuditLog).Distinct().OrderBy(o => o.TimeStamp).ToList();
+      merged.AuditLog = objects.SelectMany(o => o.AuditLog).Distinct(idOnlyComparer).OrderBy(o => o.TimeStamp).ToList();
       return merged;
     }
 
@@ -85,7 +97,7 @@ namespace BookKeeper
     private AuditEntry GetAuditEntry(T then, T now)
     {
       //TODO: Get some kind of sync'd time thing working
-      var auditEntry = new AuditEntry { TimeStamp = DateTime.UtcNow };
+      var auditEntry = new AuditEntry();
       //TODO: Once EqualityComparer implements diffing stuff, call that
       // e.g. 
       //      var diffs = EqualityComparer.GetDifferences(then, now);

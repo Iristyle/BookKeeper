@@ -5,6 +5,15 @@ namespace BookKeeper
 {
   public class AuditEntry
   {
+    public AuditEntry()
+    {
+      Id = ShortGuid.NewGuid();
+      TimeStamp = DateTime.UtcNow;
+    }
+    /// <summary>
+    /// Id derived from ShortGuid
+    /// </summary>
+    public string Id { get; private set; }
     /// <summary>
     /// List of strings representing path to delete.
     /// </summary>
@@ -16,10 +25,10 @@ namespace BookKeeper
     /// <summary>
     /// DateTime when the AuditEntry was created.
     /// </summary>
-    public DateTime TimeStamp { get; set; }
+    public DateTime TimeStamp { get; private set; }
     /// <summary>
     /// UserId of the user that made changes.
     /// </summary>
-    public string UserId { get; set; }
+    public Dictionary<string,string> Meta { get; set; }
   }
 }
