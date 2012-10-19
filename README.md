@@ -45,6 +45,8 @@ straightforward on EC2.  We feel that most systems will be OK with this
 level of precicion, but all applications are different and this won't
 work for everyone.
 
+A side-effect is that all changes to an object can be retrieved at any time, making this library great for implementing an audit log.
+
 [ISO8601]: http://en.wikipedia.org/wiki/ISO_8601
 
 ### Some Specifics
@@ -65,6 +67,7 @@ objects or items within collections
 * Provide a simple API for merging a set of divergent objects during a
 read-repair to generate a single source of truth (using the relative
 ordering described above).
+* Expose the series of object changes to the consumer.
 
 
 ### The Garbage / Compaction Issue
